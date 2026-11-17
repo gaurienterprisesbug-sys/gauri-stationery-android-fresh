@@ -1,0 +1,42 @@
+name: Build Gauri Stationery APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract Android Project
+        run: |
+          mkdir android-project
+          unzip -q Gauri_Stationery_Fresh_GitHub_Project.zip -d android-project
+          ls -la android-project
+
+      - name: Build Android APK
+        working-directory: android-project
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gauri-Stationery-APK
+          path: android-project/app/build/outputs/apk/debug/app-debug.apk
